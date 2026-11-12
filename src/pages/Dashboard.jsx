@@ -291,6 +291,14 @@ export default function Dashboard() {
           </button>
 
           <button
+            onClick={signOut}
+            title="Sign Out"
+            className="p-2.5 text-slate-500 hover:text-red-600 bg-slate-50 hover:bg-red-50 border border-slate-200 rounded-xl transition-colors"
+          >
+            <LogOut size={16} />
+          </button>
+
+          <button
             onClick={handleOpenCreate}
             className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2.5 rounded-xl text-xs sm:text-sm shadow-sm shadow-blue-200 active:scale-95 transition-all"
           >
