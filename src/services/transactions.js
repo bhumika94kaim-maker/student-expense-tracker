@@ -22,9 +22,13 @@ export async function getTransactions({ page = 0, type, categoryId, search, star
 
 // Add a new transaction
 export async function addTransaction(tx) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: null, error: new Error('User not authenticated') }
+
+  const row = { ...tx, user_id: user.id }
   const { data, error } = await supabase
     .from('transactions')
-    .insert([tx])
+    .insert([row])
     .select('*, categories(name, icon)')
     .single()
   return { data, error }
@@ -71,9 +75,12 @@ export async function getCategories() {
 
 // Add a custom category
 export async function addCategory(name, icon = '📦') {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: null, error: new Error('User not authenticated') }
+
   const { data, error } = await supabase
     .from('categories')
-    .insert([{ name, icon, is_default: false }])
+    .insert([{ user_id: user.id, name, icon, is_default: false }])
     .select()
     .single()
   return { data, error }

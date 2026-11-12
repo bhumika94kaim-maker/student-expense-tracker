@@ -38,7 +38,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel, loading }
   function validate() {
     const e = {}
     if (!isValidAmount(amount)) e.amount = 'Enter a valid amount greater than 0'
-    if (!categoryId) e.category = 'Please select a category'
+    if (type === 'expense' && !categoryId) e.category = 'Please select a category for this expense'
     if (!date) e.date = 'Please pick a date'
     return e
   }
@@ -52,7 +52,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel, loading }
     }
     onSubmit({
       type,
-      category_id: categoryId,
+      category_id: categoryId || null,
       amount: parseFloat(amount),
       description: description.trim(),
       date,
