@@ -11,12 +11,22 @@ export function AuthProvider({ children }) {
 
   // Load profile from the profiles table
   async function loadProfile(userId) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    setProfile(data)
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle()
+
+      if (data) {
+        setProfile(data)
+      } else if (!error) {
+        // Fallback profile if row is being created by trigger
+        setProfile({ id: userId, full_name: user?.user_metadata?.full_name || 'Student', currency: 'INR' })
+      }
+    } catch {
+      // In case of network glitch, keep previous profile
+    }
   }
 
   useEffect(() => {
@@ -26,22 +36,23 @@ export function AuthProvider({ children }) {
     }
 
     // Check if there's already a session when the app loads
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null)
       if (session?.user) {
-        loadProfile(session.user.id)
+        await loadProfile(session.user.id)
       }
       setLoading(false)
     })
 
     // Listen for login/logout events
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) {
-        loadProfile(session.user.id)
+        await loadProfile(session.user.id)
       } else {
         setProfile(null)
       }
+      setLoading(false)
     })
 
     return () => subscription.unsubscribe()

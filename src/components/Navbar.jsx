@@ -12,8 +12,8 @@ const navItems = [
 
 // Desktop sidebar navigation
 export function Sidebar() {
-  const { profile } = useAuth()
-  const firstName = profile?.full_name?.split(' ')[0] || 'Student'
+  const { user, profile } = useAuth()
+  const firstName = profile?.full_name?.split(' ')[0] || user?.user_metadata?.full_name?.split(' ')[0] || 'Student'
 
   return (
     <aside className="hidden md:flex flex-col w-60 min-h-screen bg-white border-r border-slate-100 p-4 fixed top-0 left-0 z-30">
